@@ -153,29 +153,38 @@ class FlowVeo3Bot {
             await modelDropdown.click({ delay: 100 });
             this.log('  ✅ "Model" dropdown menüsüne tıklandı.');
 
-            // Adım 3: "Veo 3 - Fast (Text to Video)" seçeneğine tıkla (DAHA GÜVENİLİR YÖNTEM)
+            // Adım 3: "Veo 3 - Fast (Text to Video)" seçeneğine tıkla (EN GÜVENİLİR YÖNTEM)
             this.log('  -> 3/3: "Veo 3 - Fast" seçeneği aranıyor ve tıklanıyor...');
             try {
-                // Hem metni hem de tıklanabilir rolü içeren daha kesin bir XPath kullanıyoruz.
-                const optionXPath = "//*[contains(text(), 'Veo 3 - Fast (Text to Video)') and (@role='menuitemradio' or @role='option')]";
+                // Önce menünün açıldığından ve içinde herhangi bir tıklanabilir öğe olduğundan emin ol.
+                const genericOptionSelector = '[role="menuitemradio"], [data-radix-collection-item]';
+                this.log(`    -> Menü içeriğinin yüklenmesi bekleniyor... (Selector: ${genericOptionSelector})`);
+                await this.page.waitForSelector(genericOptionSelector, { visible: true, timeout: 15000 });
+                this.log('    -> Menü içeriği yüklendi. Şimdi özel seçenek aranıyor.');
                 
-                // Elementin görünür ve tıklanabilir olmasını daha uzun bir süre bekle
-                await this.page.waitForXPath(optionXPath, { visible: true, timeout: 15000 });
-                const [optionElement] = await this.page.$x(optionXPath);
-                
-                if (optionElement) {
-                    // Sayfa içi evaluate yerine doğrudan Puppeteer'ın click metodunu kullanıyoruz. Bu daha güvenilirdir.
-                    await optionElement.click({ delay: 150 });
-                    this.log('  ✅ "Veo 3 - Fast (Text to Video)" seçildi.');
+                // Şimdi, tüm seçenekler arasından doğru metni içeren öğeyi bul ve tıkla.
+                const clicked = await this.page.evaluate((textToFind) => {
+                    const allItems = Array.from(document.querySelectorAll('[role="menuitemradio"], [role="option"], [data-radix-collection-item]'));
+                    const target = allItems.find(el => el.textContent && el.textContent.includes(textToFind));
+                    
+                    if (target) {
+                        target.click();
+                        return true;
+                    }
+                    return false;
+                }, 'Veo 3 - Fast (Text to Video)');
+
+                if (clicked) {
+                    this.log('  ✅ "Veo 3 - Fast (Text to Video)" başarıyla seçildi.');
                 } else {
-                    throw new Error('Model seçeneği element olarak bulunamadı.');
+                    throw new Error('Model seçeneği DOM içinde bulundu ancak tıklanamadı veya bulunamadı.');
                 }
 
             } catch (error) {
                  throw new Error(`"Veo 3 - Fast (Text to Video)" seçeneği bulunamadı veya tıklanamadı. Hata: ${error.message}`);
             }
             
-            await new Promise(r => setTimeout(r, 1500)); // Seçimin uygulanması ve menünün kapanması için bekleme süresini artırdım
+            await new Promise(r => setTimeout(r, 1500)); // Seçimin uygulanması ve menünün kapanması için bekleme
 
             // Ayarlar menüsünü kapatmak için Escape tuşuna bas (gerekirse diye)
             await this.page.keyboard.press('Escape');
