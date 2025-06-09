@@ -5,7 +5,8 @@
   "main": "api.js",
   "scripts": {
     "test": "node veo3-real-test.js",
-    "start": "node api.js"
+    "start": "node api.js",
+    "postinstall": "npx puppeteer browsers install chrome"
   },
   "dependencies": {
     "express": "^5.1.0",
