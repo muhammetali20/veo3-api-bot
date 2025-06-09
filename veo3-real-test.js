@@ -138,47 +138,26 @@ class FlowVeo3Bot {
             // Adım 3: "Veo 3 - Fast (Text to Video)" seçeneğine tıkla (DAHA GÜVENİLİR YÖNTEM)
             this.log('  -> 3/3: "Veo 3 - Fast" seçeneği aranıyor ve tıklanıyor...');
             try {
-                // Önce seçeneğin görünür olmasını bekle
-                const optionSelector = "//*[contains(text(), 'Veo 3 - Fast (Text to Video)')]";
-                await this.page.waitForXPath(optionSelector, { visible: true, timeout: 5000 });
+                // Hem metni hem de tıklanabilir rolü içeren daha kesin bir XPath kullanıyoruz.
+                const optionXPath = "//*[contains(text(), 'Veo 3 - Fast (Text to Video)') and (@role='menuitemradio' or @role='option')]";
                 
-                // Sayfa içinde JS çalıştırarak elementi bul ve tıkla
-                const clicked = await this.page.evaluate(() => {
-                    const textToFind = 'Veo 3 - Fast (Text to Video)';
-                    // Genellikle Radix UI bu `data-radix-collection-item` niteliğini kullanır.
-                    const allItems = document.querySelectorAll('[data-radix-collection-item]');
-                    
-                    if (allItems.length > 0) {
-                        for (const item of allItems) {
-                            if (item.textContent.includes(textToFind)) {
-                                item.click();
-                                return true; // Başarılı
-                            }
-                        }
-                    }
-                    
-                    // Fallback: Eğer üstteki seçici çalışmazsa, rol'e göre ara
-                    const optionsByRole = Array.from(document.querySelectorAll('[role="menuitemradio"], [role="option"]'));
-                    const target = optionsByRole.find(el => el.textContent.includes(textToFind));
-                    if (target) {
-                        target.click();
-                        return true; // Başarılı
-                    }
-
-                    return false; // Hiçbiri çalışmazsa başarısız
-                });
-
-                if (!clicked) {
-                    throw new Error('Model seçeneği DOM içinde bulundu ama tıklanamadı.');
+                // Elementin görünür ve tıklanabilir olmasını daha uzun bir süre bekle
+                await this.page.waitForXPath(optionXPath, { visible: true, timeout: 15000 });
+                const [optionElement] = await this.page.$x(optionXPath);
+                
+                if (optionElement) {
+                    // Sayfa içi evaluate yerine doğrudan Puppeteer'ın click metodunu kullanıyoruz. Bu daha güvenilirdir.
+                    await optionElement.click({ delay: 150 });
+                    this.log('  ✅ "Veo 3 - Fast (Text to Video)" seçildi.');
+                } else {
+                    throw new Error('Model seçeneği element olarak bulunamadı.');
                 }
-                
-                this.log('  ✅ "Veo 3 - Fast (Text to Video)" seçildi.');
 
             } catch (error) {
-                 throw new Error(`"Veo 3 - Fast (Text to Video)" seçeneği bulunamadı veya görünür değil. Hata: ${error.message}`);
+                 throw new Error(`"Veo 3 - Fast (Text to Video)" seçeneği bulunamadı veya tıklanamadı. Hata: ${error.message}`);
             }
             
-            await new Promise(r => setTimeout(r, 1000)); // Seçimin uygulanması ve menünün kapanması için bekleme süresini artırdım
+            await new Promise(r => setTimeout(r, 1500)); // Seçimin uygulanması ve menünün kapanması için bekleme süresini artırdım
 
             // Ayarlar menüsünü kapatmak için Escape tuşuna bas (gerekirse diye)
             await this.page.keyboard.press('Escape');
