@@ -1,0 +1,39 @@
+# Node.js bağımlılıkları - Asla Git'e gönderilmez
+/node_modules
+
+# Puppeteer ve tarayıcı verileri
+/chrome-user-data
+/downloads
+/screenshots
+
+# İşletim sistemi dosyaları
+.DS_Store
+
+# Log dosyaları
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Ortam değişkenleri dosyası - Güvenlik için asla paylaşılmaz
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build çıktıları
+/build
+/dist
+
+# Bağımlılıklar
+*.mp4
+*.png
+HATA-*.png
+DEBUG-*.png
+01-proje_sayfasi.png
+02-model_secildi.png
+
+# Hassas ve geçici dosyalar
+/google-cookies.json
+/kaynak.txt 

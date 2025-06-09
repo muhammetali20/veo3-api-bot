@@ -1,0 +1,23 @@
+{
+  "name": "veo3-test-bot",
+  "version": "1.0.0",
+  "description": "Veo3 video generation test with JavaScript/Puppeteer",
+  "main": "api.js",
+  "scripts": {
+    "test": "node veo3-real-test.js",
+    "start": "node api.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "puppeteer": "^21.11.0"
+  },
+  "keywords": [
+    "veo3",
+    "video-ai",
+    "puppeteer",
+    "automation",
+    "google-ai"
+  ],
+  "author": "Veo3 Test Bot",
+  "license": "MIT"
+}

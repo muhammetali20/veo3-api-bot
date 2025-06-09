@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: video-generator-service
+    runtime: node
+    plan: free # Göreviniz 15 dakikadan uzun sürerse bunu 'starter' olarak değiştirin
+    buildCommand: "npm install"
+    startCommand: "node api.js"
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "18.17.1"
+      - key: PUPPETEER_CACHE_DIR
+        value: "/opt/render/.cache/puppeteer"
+      - key: PUPPETEER_EXECUTABLE_PATH
+        value: "/usr/bin/google-chrome"
+    autoDeploy: false 
