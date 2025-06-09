@@ -50,6 +50,24 @@ class FlowVeo3Bot {
         this.log('✅ Bot hazır ve çalışıyor.');
     }
 
+    async loadCookies() {
+        this.log('🍪 Cookie dosyası aranıyor ve yükleniyor...');
+        try {
+            const cookiePath = './google-cookies.json';
+            if (fs.existsSync(cookiePath)) {
+                const cookiesString = fs.readFileSync(cookiePath);
+                const cookies = JSON.parse(cookiesString);
+                await this.page.setCookie(...cookies);
+                this.log('✅ Cookie\'ler başarıyla tarayıcıya yüklendi.');
+            } else {
+                this.log('⚠️ Cookie dosyası bulunamadı, misafir olarak devam ediliyor.');
+            }
+        } catch (error) {
+            this.log('❌ Cookie yüklenirken bir hata oluştu:', error.message);
+            // Hata olsa bile devam etmeyi deneyebiliriz.
+        }
+    }
+
     async goToProjectPage() {
         this.log('🌐 Direkt olarak proje sayfasına gidiliyor...');
         try {

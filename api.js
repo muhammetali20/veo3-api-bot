@@ -88,6 +88,7 @@ async function runVideoGeneration(promptText) {
     try {
         // process.env.NODE_ENV 'production' olduğunda (Render üzerinde) headless mod true olacak
         await bot.init(process.env.NODE_ENV === 'production');
+        await bot.loadCookies();
         await bot.goToProjectPage();
         await bot.selectModel();
         await bot.enterPrompt(promptText);
